@@ -1,0 +1,37 @@
+# Local Python environments, dependencies and editor state
+.deps/
+.deps-cuda/
+.venv/
+.vscode/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.env
+.env.*
+*.log
+*.lock
+
+# Shared generated/downloaded data; use trm/data.py to reconstruct
+/data/
+
+# Training artifacts stay on the GPU instance
+/runs/**
+!/runs/README.md
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.npy
+*.npz
+
+# Upstream datasets/assets not needed by the Sudoku reproduction
+/trm/vendor/kaggle/
+/trm/vendor/assets/
+
+# Optimizer compiler products and package metadata
+build/
+dist/
+*.egg-info/
+.eggs/
+*.so
+*.o
