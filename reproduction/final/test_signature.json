@@ -1,0 +1,7 @@
+{
+  "checkpoint_sha": "f9ad6c775910a5fbff6c11b0d14a0380d2a255c6fc8fc1ae7c956506a30ccf06",
+  "manifest_sha": "5176ea22b62671718a605a3dc6bd6f96d75078add8ebbb1dcd203cc1a7b6cc4e",
+  "split": "test",
+  "batch_size": 256,
+  "limit": null
+}

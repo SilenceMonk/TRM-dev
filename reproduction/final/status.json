@@ -1,0 +1,34 @@
+{
+  "step": 65100,
+  "total_steps": 65100,
+  "complete": true,
+  "phase": "complete",
+  "replication_target_met": true,
+  "reference_exact_accuracy": 0.874,
+  "metrics": {
+    "split": "test",
+    "n": 422786,
+    "expected_n": 422786,
+    "complete": true,
+    "exact_accuracy": 0.8615564375357746,
+    "cell_accuracy": 0.9480233206736292,
+    "blank_cell_accuracy": 0.924553294886337,
+    "sudoku_valid_rate": 0.8622636511142753,
+    "clues_preserved_rate": 0.9992856906330863,
+    "inference_rounds": 16,
+    "raw_argmax": true,
+    "totals": {
+      "exact": 364254,
+      "cells": 32465690,
+      "blanks_correct": 21808818,
+      "blanks": 23588492,
+      "valid": 364553,
+      "clues": 422484
+    },
+    "exact_wilson_95": [
+      0.8605121152860504,
+      0.8625941895984699
+    ]
+  },
+  "elapsed_seconds": 79938.51435274817
+}

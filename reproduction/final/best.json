@@ -1,0 +1,29 @@
+{
+  "step": 65100,
+  "metrics": {
+    "split": "val",
+    "n": 1000,
+    "expected_n": 1000,
+    "complete": true,
+    "exact_accuracy": 0.874,
+    "cell_accuracy": 0.9532222222222222,
+    "blank_cell_accuracy": 0.9319635031252245,
+    "sudoku_valid_rate": 0.875,
+    "clues_preserved_rate": 0.999,
+    "inference_rounds": 16,
+    "raw_argmax": true,
+    "totals": {
+      "exact": 874,
+      "cells": 77211,
+      "blanks_correct": 51888,
+      "blanks": 55676,
+      "valid": 875,
+      "clues": 999
+    },
+    "exact_wilson_95": [
+      0.8519904953398139,
+      0.8931470893129909
+    ]
+  },
+  "checkpoint": "best_ema_step_065100.pt"
+}

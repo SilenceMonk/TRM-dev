@@ -1,0 +1,7 @@
+{
+  "torch": "2.14.1+cu130",
+  "cuda": "13.0",
+  "gpu": "NVIDIA GeForce RTX 5070 Ti",
+  "source_sha": "c01103738605ba39d1430519b1ee0c62f4c707f8",
+  "data_sha": "58942f96baeb572ca3127e2a9e9c70f330783d6b"
+}

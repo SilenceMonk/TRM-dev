@@ -1,5 +1,19 @@
 # TRM Sudoku-Extreme reproduction
 
+## 已完成的复现结果
+
+TRM 已完成 **65,100 次更新**和 **422,786 道官方测试题**。
+
+| 指标 | 验证集（1,000 题） | 官方测试集（422,786 题） |
+| --- | ---: | ---: |
+| 整盘完全正确率 | 87.40% | **86.16%** |
+| 未知格准确率 | 93.20% | 92.46% |
+| 全部单格准确率 | 95.32% | 94.80% |
+
+官方测试整盘正确 **364,254 / 422,786**，95% Wilson 区间 **86.05%–86.26%**。相对论文参考 87.4% 低 **1.24 个百分点**，位于本次预期约 ±2 个百分点范围内；采用新固定 seed-0 训练子集，无法保证与作者原始 1K 完全一致。验证集 87.4% 与官方测试 86.16% 为两个不同结果。
+
+详细结果和可追溯记录见 [reproduction/final/](reproduction/final/README.md)，历次验证见 [validation_history.csv](reproduction/final/validation_history.csv)。数据、checkpoint、逐题预测和完整日志保留本机；`trm_ode/` 仍只有占位结构。
+
 新增独立项目；原有 `/workspace/_trm_revision_probe`、`/workspace/sudoku`、数据和 checkpoint 均未改动。
 
 ```

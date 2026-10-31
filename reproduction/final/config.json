@@ -1,0 +1,21 @@
+{
+  "seed": 0,
+  "effective_batch": 768,
+  "micro_batch": 256,
+  "epochs": 50000,
+  "epochs_per_window": 5000,
+  "lr": 0.0001,
+  "warmup": 2000,
+  "weight_decay": 1.0,
+  "beta1": 0.9,
+  "beta2": 0.95,
+  "ema_rate": 0.999,
+  "save_every": 250,
+  "val_every": 6510,
+  "log_every": 10,
+  "eval_batch": 256,
+  "compile_mode": "full",
+  "data_dir": "/workspace/project/data",
+  "source_sha": "c01103738605ba39d1430519b1ee0c62f4c707f8",
+  "data_sha": "58942f96baeb572ca3127e2a9e9c70f330783d6b"
+}

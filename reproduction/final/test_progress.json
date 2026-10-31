@@ -1,0 +1,14 @@
+{
+  "processed": 422786,
+  "n": 422786,
+  "split": "test",
+  "batch_size": 256,
+  "totals": {
+    "exact": 364254,
+    "cells": 32465690,
+    "blanks_correct": 21808818,
+    "blanks": 23588492,
+    "valid": 364553,
+    "clues": 422484
+  }
+}

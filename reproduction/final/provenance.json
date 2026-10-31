@@ -1,0 +1,16 @@
+{
+  "captured_at_utc": "2026-10-31T20:05:04.206793+00:00",
+  "checkpoint": "runs/trm/sudoku_mlp_seed0/ema_step_065100.pt",
+  "checkpoint_sha256": "f9ad6c775910a5fbff6c11b0d14a0380d2a255c6fc8fc1ae7c956506a30ccf06",
+  "weights": "ema",
+  "checkpoint_uploaded": false,
+  "official_test_complete": true,
+  "source_files_unchanged": true,
+  "training_seconds_including_periodic_validation": 79938.51435274817,
+  "notes": [
+    "Validation: held-out 1000 puzzles from source training split.",
+    "Official test: all 422786 puzzles, raw argmax after 16 rounds.",
+    "Seed-0 training subset; original paper subset indices unavailable.",
+    "Checkpoint, generated data, raw predictions and full training logs remain local."
+  ]
+}
