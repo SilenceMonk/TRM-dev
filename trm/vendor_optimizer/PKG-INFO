@@ -1,0 +1,57 @@
+Metadata-Version: 2.4
+Name: adam_atan2
+Version: 0.0.3
+Summary: Adam-atan2 Fused Optimizer
+Home-page: https://github.com/imoneoi/adam_atan2
+Author: One
+Author-email: imonenext@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: Unix
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license-file
+Dynamic: summary
+
+# Adam-atan2 Fused Operator
+
+## Usage
+
+Drop-in replacement of `torch.optim.AdamW`.
+ 
+ - Doesn't support `foreach`, `fused` argument, as the optimizer is already fused
+ - Doesn't support `amsgrad`, `maximize`, `capturable`, `differentiable` argument yet
+
+```bash
+pip install adam-atan2
+```
+
+```python
+from adam_atan2 import AdamATan2
+
+# All supported arguments are listed below
+optim = AdamATan2(model.parameters(),
+    lr=1e-3,
+    weight_decay=0.1,
+    betas=(0.9, 0.95)
+)
+```
+
+## Consistency Tests
+
+We tested the consistency against reference AdamW-atan2 PyTorch implementation. To run tests, clone this repository, run pytest:
+
+```bash
+pip install -e .
+pytest
+```
+
+## References
+
+ - https://arxiv.org/pdf/2407.05872

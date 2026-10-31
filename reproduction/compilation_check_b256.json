@@ -1,0 +1,21 @@
+{
+  "micro_batch": 256,
+  "compiled_eager_max_parameter_difference": 1.043081283569336e-07,
+  "compiled_metrics": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1982.497314453125,
+    5.1573486328125
+  ],
+  "eager_metrics": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1981.88427734375,
+    5.1573486328125
+  ],
+  "passed": true
+}

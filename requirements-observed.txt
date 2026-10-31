@@ -1,0 +1,8 @@
+torch==2.14.1+cu130
+numpy==2.5.4
+pydantic==2.14.1
+einops==0.8.2
+huggingface-hub==0.36.2
+triton==3.8.0
+setuptools==84.2.1
+# Adam-ATan2 0.0.3 source is locally patched for sm_120 / C++20; see trm/vendor_optimizer.

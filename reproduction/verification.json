@@ -1,0 +1,11 @@
+{
+  "official_model_source_exact": true,
+  "source_sha256": "3454818b64a1abb45c062782d380aa4bb560e2cb35db9cc309cf367ca3ac262c",
+  "gpu_operation": true,
+  "finite_training": true,
+  "legal_training_augments": true,
+  "sampler_resume_exact": true,
+  "training_resume_bitwise_exact": true,
+  "fused_optimizer_equation": true,
+  "microbatch_vs_full_max_parameter_difference": 1.043081283569336e-07
+}

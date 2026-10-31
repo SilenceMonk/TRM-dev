@@ -1,0 +1,8 @@
+{
+  "source_checks": true,
+  "all_1001000_augments_valid": true,
+  "optimizer_equation": true,
+  "eager_resume_bitwise_exact": true,
+  "compiled_update_comparison": true,
+  "compiled_cli_resume_and_validation": true
+}

@@ -1,0 +1,73 @@
+{
+  "selected_micro_batch": 256,
+  "effective_batch": 768,
+  "selected_compile": "full",
+  "reason": "Fastest measured configuration fitting GPU memory",
+  "benchmarks": [
+    {
+      "micro_batch": 128,
+      "compile_mode": "block",
+      "seconds": [
+        34.78687170194462,
+        1.2587464973330498,
+        1.2574474974535406,
+        1.2569491909816861,
+        1.256789474748075
+      ],
+      "median_steady_seconds": 1.2569491909816861,
+      "peak_GiB": 5.275807857513428
+    },
+    {
+      "micro_batch": 256,
+      "compile_mode": "block",
+      "seconds": [
+        31.635550544131547,
+        1.2426267061382532,
+        1.2426820448599756,
+        1.2420297898352146,
+        1.242398229893297,
+        1.241850895807147,
+        1.2426917445845902,
+        1.2428433960303664
+      ],
+      "median_steady_seconds": 1.2425401373766363,
+      "peak_GiB": 10.16132926940918
+    },
+    {
+      "micro_batch": 256,
+      "compile_mode": "full",
+      "seconds": [
+        90.52805461036041,
+        1.2229990921914577,
+        1.223097869195044,
+        1.2223483766429126,
+        1.222615203820169,
+        1.2227561953477561,
+        1.2231253222562373,
+        1.2228528601117432
+      ],
+      "median_steady_seconds": 1.2228045277297497,
+      "peak_GiB": 10.100895881652832
+    },
+    {
+      "micro_batch": 256,
+      "compile_mode": "none",
+      "seconds": [
+        2.5654622949659824,
+        2.0026763761416078,
+        2.0024093678221107,
+        2.00259713223204,
+        2.0026615811511874,
+        2.003224982880056
+      ],
+      "median_steady_seconds": 2.002629356691614,
+      "peak_GiB": 13.633009433746338
+    },
+    {
+      "micro_batch": 384,
+      "compile_mode": "full",
+      "outcome": "CUDA out of memory",
+      "selected": false
+    }
+  ]
+}

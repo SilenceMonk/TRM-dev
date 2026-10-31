@@ -1,0 +1,9 @@
+{
+  "source": "https://pypi.org/project/adam-atan2/0.0.3/",
+  "sdist_sha256": "f07faef4a6d7476ad3be6096155a35a5ecf6a3932282367f05d45158b81ff5a8",
+  "modifications": [
+    "setup.py: compile only sm_120",
+    "setup.py: C++17 -> C++20"
+  ],
+  "installed_local_metadata_version": "0.0.0"
+}
