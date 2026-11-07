@@ -1,0 +1,6 @@
+# Existing /venv/main environment; do not replace a working CUDA PyTorch wheel.
+# Observed torch==2.14.1+cu132, torchvision==0.29.1+cu132
+# Build the original TRM optimizer before running:
+# MAX_JOBS=3 uv pip install --python /venv/main/bin/python --no-build-isolation ./trm/vendor_optimizer
+einops==0.8.2
+torch-fidelity==0.4.0

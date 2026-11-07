@@ -63,3 +63,15 @@ cd /workspace/project
 RTX 5070 Ti 16GB / PyTorch 2.14.1+cu130 实测：256 micro-batch + full compile 约1.22秒/update、峰值10.10 GiB；block compile约1.24秒；不编译约2.00秒、峰值13.63 GiB。128 micro-batch + block约1.26秒。384 micro-batch显存不足。选择256/full，有效batch仍为768。估算纯训练约22小时，额外需要验证、保存和完整测试时间。
 
 完整数据集的1,001,000份增强均经过合法解和clue一致性校验。最终结果另写 `runs/trm/sudoku_mlp_seed0/RESULTS.md`，并明确 `replication_target_met`，避免将跑完训练等同达到论文效果。
+
+## CIFAR-10 Looped Flows 三个实现
+
+| 实现 | 目录 | 输出头与训练目标 |
+| --- | --- | --- |
+| 原始TRM Mixer | [cifar10_looped_flows](cifar10_looped_flows/README.md) | 线性图像输出，普通MSE、均匀顺序时间 |
+| 残差卷积版 | [cifar10_looped_flows_conv_archive](cifar10_looped_flows_conv_archive/README.md) | 零初始化3×3残差卷积，支持旧checkpoint迁移及从头训练 |
+| v2 / JiT | [cifar10_looped_flows_v2_jit](cifar10_looped_flows_v2_jit/README.md) | JiT调制输出头、加权MSE、logit-normal顺序时间、分母下限 |
+
+共同方法方案见[cifar10_looped_flows_trm.md](cifar10_looped_flows_trm.md)。三者均使用原TRM Adam-ATan2，CIFAR-10固定45000/5000划分，不继承上方Sudoku指标。
+
+当前所有实验停止，服务模板关闭autostart。v2已完成100000步，但自由生成存在严重对比度膨胀，质量未达目标，未计算FID；检查见[v2采样评估](cifar10_looped_flows_v2_jit/results/REVIEW.md)。代码、运行脚本和说明保留在仓库；数据、完整日志、样图和模型权重仅留本机，不上传Git。
