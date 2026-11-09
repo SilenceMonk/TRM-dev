@@ -7,6 +7,7 @@ import torch
 from torchvision.datasets import CIFAR10
 from torchvision.utils import save_image
 from model import TRMJiT, sample
+from jit_head import OUTPUT_HEAD_DESCRIPTION
 from data import ROOT
 
 
@@ -29,6 +30,8 @@ def main():
     if list(images_dir.glob('*.png')):
         raise FileExistsError('Use a fresh output directory to avoid mixing samples')
     checkpoint=torch.load(args.checkpoint,map_location='cpu',weights_only=False)
+    if checkpoint['config']['output_head'] != OUTPUT_HEAD_DESCRIPTION:
+        raise ValueError('Checkpoint output head does not match gamma-only head; use its original code revision')
     net=TRMJiT().cuda().eval()
     net.load_state_dict(checkpoint['ema'], strict=True)
     if args.compile:net.core.compile(dynamic=False)

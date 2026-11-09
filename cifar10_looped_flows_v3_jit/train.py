@@ -12,6 +12,7 @@ import torch
 from torchvision.utils import save_image
 from adam_atan2 import AdamATan2
 from model import TRMJiT, sample
+from jit_head import OUTPUT_HEAD_DESCRIPTION
 from objective import weighted_mse, sample_times
 from data import load_data, normalize, ROOT
 
@@ -49,7 +50,7 @@ def validate(model, data, batch=64, t_eps=0.05):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('--run', default='runs/cifar10_looped_flows_v3_jit/seed0')
+    p.add_argument('--run', default='runs/cifar10_looped_flows_v3_jit/seed0_gamma_only')
     p.add_argument('--batch-size', type=int, default=768)
     p.add_argument('--steps', type=int, default=100000, help='Local optimizer updates, must be multiple of Nsup=4')
     p.add_argument('--seed', type=int, default=0)
@@ -87,7 +88,7 @@ def main():
                   cuda_arch='sm'+''.join(map(str, torch.cuda.get_device_capability())),
                   betas=[.9,.95], weight_decay=1., ema=.999, lr_schedule='linear warmup then constant (original TRM)',
                   parameters=sum(p.numel() for p in model.parameters()),
-                  output_head='JiT FinalLayer: affine RMSNorm eps1e-6, time shift/scale, zero-init biased linear; FP32',
+                  output_head=OUTPUT_HEAD_DESCRIPTION,
                   torch=torch.__version__, gpu=torch.cuda.get_device_name(),
                   time_sampling='one sigmoid(N(p_mean,p_std^2)) time per image; fixed across Nsup=4',
                   loss='mean(((prediction-target)/max(1-t,t_eps))^2)',

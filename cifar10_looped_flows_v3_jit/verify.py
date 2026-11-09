@@ -6,6 +6,7 @@ from pathlib import Path
 import torch
 from model import TRMJiT, AttentionBlock, patchify, unpatchify, sample
 from objective import sample_times, weighted_mse
+from jit_head import FinalLayer, OUTPUT_HEAD_DESCRIPTION
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from trm.model import TinyRecursiveReasoningModel_ACTV1Block, TinyRecursiveReasoningModel_ACTV1Config
 from adam_atan2 import AdamATan2
@@ -16,6 +17,18 @@ def main():
     torch.manual_seed(17)
     device = 'cuda'
     model = TRMJiT().to(device)
+    # A deliberately non-unit-RMS input catches accidental renormalization.
+    assert torch.equal(model.output.gamma, torch.ones_like(model.output.gamma))
+    head = FinalLayer(512,4,3).cuda()
+    with torch.no_grad(): head.gamma.copy_(torch.linspace(.5,1.5,512,device=device))
+    features = torch.randn(2,64,512,device=device)*3
+    condition = torch.randn(2,512,device=device)
+    shift, scale = head.adaLN_modulation(condition).chunk(2,dim=1)
+    expected = head.linear((features*head.gamma)*(1+scale[:,None,:])+shift[:,None,:])
+    actual = head(features,condition)
+    assert torch.equal(actual,expected)
+    actual.square().mean().backward()
+    assert torch.isfinite(head.gamma.grad).all() and head.gamma.grad.abs().sum() > 0
     cfg = TinyRecursiveReasoningModel_ACTV1Config(batch_size=2, seq_len=64,
         num_puzzle_identifiers=1, vocab_size=1, H_cycles=3, L_cycles=6, H_layers=0,
         L_layers=2, hidden_size=512, expansion=4, num_heads=8, pos_encodings='rope',
@@ -72,12 +85,13 @@ def main():
     expected = x.float().clone()
     for i in range(32): expected += (.7-expected)/(32*max(1-i/32,.05))
     assert torch.allclose(sample(Constant(),x,32),expected)
-    report = dict(attention_matches_original=True, patch_roundtrip=True, jit_loss_equivalence=True,
+    report = dict(output_head=OUTPUT_HEAD_DESCRIPTION, gamma_only_head_exact=True, gamma_gradient=True,
+        attention_matches_original=True, patch_roundtrip=True, jit_loss_equivalence=True,
         single_time_sampling=True, Nsup=4, core_calls=counts, detached_state=True,
         zero_head_then_nonzero_core_gradient=True, stateless_four_cycle_prediction=True,
         optimizer_replay_exact=True, clamped_euler_all_steps=True,
         parameters=sum(p.numel() for p in model.parameters()), torch=torch.__version__)
-    out = Path('runs/cifar10_looped_flows_v3_jit'); out.mkdir(parents=True,exist_ok=True)
+    out = Path('runs/cifar10_looped_flows_v3_jit/gamma_only_checks'); out.mkdir(parents=True,exist_ok=True)
     (out/'verification.json').write_text(json.dumps(report,indent=2))
     print(json.dumps(report,indent=2))
 

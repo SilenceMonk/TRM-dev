@@ -48,6 +48,6 @@ try:
         peak_reserved_gib=torch.cuda.max_memory_reserved()/2**30)
 except torch.OutOfMemoryError:
     report.update(success=False,error='CUDA OOM')
-out=Path('runs/cifar10_looped_flows_v3_jit'); out.mkdir(parents=True,exist_ok=True)
+out=Path('runs/cifar10_looped_flows_v3_jit/gamma_only_checks'); out.mkdir(parents=True,exist_ok=True)
 (out/f'benchmark_{a.batch_size}_{"compile" if a.compile else "eager"}.json').write_text(json.dumps(report,indent=2))
 print(json.dumps(report,indent=2),flush=True)

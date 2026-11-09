@@ -71,7 +71,7 @@ RTX 5070 Ti 16GB / PyTorch 2.14.1+cu130 实测：256 micro-batch + full compile 
 | 原始TRM Mixer | [cifar10_looped_flows](cifar10_looped_flows/README.md) | 线性图像输出，普通MSE、均匀顺序时间 |
 | 残差卷积版 | [cifar10_looped_flows_conv_archive](cifar10_looped_flows_conv_archive/README.md) | 零初始化3×3残差卷积，支持旧checkpoint迁移及从头训练 |
 | v2 / JiT | [cifar10_looped_flows_v2_jit](cifar10_looped_flows_v2_jit/README.md) | JiT调制输出头、加权MSE、logit-normal顺序时间、分母下限 |
-| v3 / attention TRM + RoPE / JiT | [cifar10_looped_flows_v3_jit](cifar10_looped_flows_v3_jit/README.md) | 独立attention TRM模块、RoPE、单时间JiT、Nsup=4 deep supervision |
+| v3 / attention TRM + RoPE / JiT | [cifar10_looped_flows_v3_jit](cifar10_looped_flows_v3_jit/README.md) | 独立attention TRM模块、RoPE、单时间JiT、Nsup=4 deep supervision、输出仅gamma缩放 |
 
 原 Looped Flows 方法方案见[cifar10_looped_flows_trm.md](cifar10_looped_flows_trm.md)，v3 改用单时间 JiT。四个实现均使用原TRM Adam-ATan2，CIFAR-10固定45000/5000划分，不继承上方Sudoku指标。
 
