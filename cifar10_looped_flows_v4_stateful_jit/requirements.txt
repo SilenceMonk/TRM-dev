@@ -1,0 +1,11 @@
+# CUDA 12.8 / RTX A4000; install torch/torchvision from the cu128 index.
+torch==2.7.1
+torchvision==0.22.1
+einops==0.8.2
+numpy==2.5.4
+pydantic==2.14.3
+torch-fidelity==0.4.0
+ninja==1.13.2
+setuptools-scm==10.3.4
+wheel==0.48.0
+supervisor==4.3.0

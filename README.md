@@ -72,7 +72,8 @@ RTX 5070 Ti 16GB / PyTorch 2.14.1+cu130 实测：256 micro-batch + full compile 
 | 残差卷积版 | [cifar10_looped_flows_conv_archive](cifar10_looped_flows_conv_archive/README.md) | 零初始化3×3残差卷积，支持旧checkpoint迁移及从头训练 |
 | v2 / JiT | [cifar10_looped_flows_v2_jit](cifar10_looped_flows_v2_jit/README.md) | JiT调制输出头、加权MSE、logit-normal顺序时间、分母下限 |
 | v3 / attention TRM + RoPE / JiT | [cifar10_looped_flows_v3_jit](cifar10_looped_flows_v3_jit/README.md) | 独立attention TRM模块、RoPE、单时间JiT、Nsup=4 deep supervision、输出仅gamma缩放 |
+| v4 / Stateful TRM-JiT | [cifar10_looped_flows_v4_stateful_jit](cifar10_looped_flows_v4_stateful_jit/README.md) | 每时间点单周期、共享噪声、跨flow时间携带状态，保留JiT目标 |
 
-原 Looped Flows 方法方案见[cifar10_looped_flows_trm.md](cifar10_looped_flows_trm.md)，v3 改用单时间 JiT。四个实现均使用原TRM Adam-ATan2，CIFAR-10固定45000/5000划分，不继承上方Sudoku指标。
+原 Looped Flows 方法方案见[cifar10_looped_flows_trm.md](cifar10_looped_flows_trm.md)，v3 改用单时间 JiT。上述实现均使用原TRM Adam-ATan2，CIFAR-10固定45000/5000划分，不继承上方Sudoku指标。
 
 旧实验均已停止，旧服务模板关闭autostart。v3新增独立训练服务，运行状态见其run目录。v2已完成100000步，但自由生成存在严重对比度膨胀，质量未达目标，未计算FID；检查见[v2采样评估](cifar10_looped_flows_v2_jit/results/REVIEW.md)。代码、运行脚本和说明保留在仓库；数据、完整日志、样图和模型权重仅留本机，不上传Git。
