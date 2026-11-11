@@ -1,0 +1,6 @@
+# Use the repository CUDA PyTorch environment and installed AdamATan2 extension.
+numpy>=2
+einops>=0.8
+tokenizers==0.23.3
+huggingface-hub==2.4.0
+pyarrow==26.0.1

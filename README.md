@@ -64,6 +64,14 @@ RTX 5070 Ti 16GB / PyTorch 2.14.1+cu130 实测：256 micro-batch + full compile 
 
 完整数据集的1,001,000份增强均经过合法解和clue一致性校验。最终结果另写 `runs/trm/sudoku_mlp_seed0/RESULTS.md`，并明确 `replication_target_met`，避免将跑完训练等同达到论文效果。
 
+## TinyStories 语言模型
+
+新增 [TRM TinyStories D256](trm_tinystories/README.md)：独立因果语言模型，沿用双状态 H=3/L=6、两层共享递归模块，报告独立验证集 next-token loss/PPL。训练入口 `service/trm_tinystories.sh`，运行结果保留在 `runs/trm_tinystories/d256_seed0/`。
+
+当前新实验从随机初始化同时训练/评估 raw 与 EMA，多轮运行至验证早停：`service/trm_tinystories_ema.sh`，结果位于 `runs/trm_tinystories/d256_seed0_ema/`。旧 raw 第二轮已停止并保存。
+
+EMA 实验已完成 10 轮 / 81,410 步并早停；完整验证最佳 EMA loss **1.8800**、PPL **6.5537**。详见 [TinyStories 最终结果](trm_tinystories/RESULTS.md)。
+
 ## CIFAR-10 生成实现
 
 | 实现 | 目录 | 输出头与训练目标 |
