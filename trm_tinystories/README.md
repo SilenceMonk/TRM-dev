@@ -1,5 +1,9 @@
 # TRM TinyStories / D256
 
+新增 [逐 token ACT / 最大 16 轮深监督](ACT.md)：独立 `train_act.py` 从随机初始化训练，保留 raw/EMA 验证和多轮早停；入口 `service/trm_tinystories_act16.sh`，输出 `runs/trm_tinystories/d256_seed0_act16_ema/`。此前单周期结果如下保留，不能视为新 ACT 实验的成绩。
+
+ACT 实验已于 2026-11-13 20:42 UTC 按要求停止并保存 checkpoint；最佳 EMA PPL **8.8777**，尚未达到预设早停条件。详见 [ACT 实验停止记录](ACT_RESULTS.md)。
+
 ## 当前实验：从头训练 raw + EMA，多轮验证早停
 
 本次实验已于 2026-11-11 16:13 UTC 达到早停条件，完成 **10 轮 / 81,410 步**，耗时 **9 小时 49 分钟**。最佳完整验证 EMA loss **1.880033**、PPL **6.553722**；最佳 raw loss **1.915671**、PPL **6.791492**。最终实测及各轮结果见 [RESULTS.md](RESULTS.md)。代码和结果摘要同步 Git；数据、日志、tokenizer 和权重保留本机。

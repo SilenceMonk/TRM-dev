@@ -72,6 +72,10 @@ RTX 5070 Ti 16GB / PyTorch 2.14.1+cu130 实测：256 micro-batch + full compile 
 
 EMA 实验已完成 10 轮 / 81,410 步并早停；完整验证最佳 EMA loss **1.8800**、PPL **6.5537**。详见 [TinyStories 最终结果](trm_tinystories/RESULTS.md)。
 
+新增 [逐 token ACT / 16 轮深监督](trm_tinystories/ACT.md) 独立实现，入口 `service/trm_tinystories_act16.sh`，重新训练并同时评估 raw/EMA；旧成绩保持为单周期实验结果。
+
+ACT 实验已于 2026-11-13 按要求手动停止；最佳完整验证 EMA loss **2.1835**、PPL **8.8777**，完整恢复状态保留本机。详见 [ACT 停止记录](trm_tinystories/ACT_RESULTS.md)。
+
 ## CIFAR-10 生成实现
 
 | 实现 | 目录 | 输出头与训练目标 |
