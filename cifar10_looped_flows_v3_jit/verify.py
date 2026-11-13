@@ -1,4 +1,5 @@
 """Check TRM parity, truncated gradients, JiT loss, stateless inference and Euler."""
+import argparse
 import copy
 import json
 import sys
@@ -13,10 +14,13 @@ from adam_atan2 import AdamATan2
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--nsup', type=int, choices=(1,4), default=4)
+    args = parser.parse_args()
     torch.set_num_threads(3)
     torch.manual_seed(17)
     device = 'cuda'
-    model = TRMJiT().to(device)
+    model = TRMJiT(Nsup=args.nsup).to(device)
     # A deliberately non-unit-RMS input catches accidental renormalization.
     assert torch.equal(model.output.gamma, torch.ones_like(model.output.gamma))
     head = FinalLayer(512,4,3).cuda()
@@ -54,7 +58,7 @@ def main():
     handle = model.core.register_forward_pre_hook(count)
     optimizer = AdamATan2(model.parameters(),lr=1e-4,betas=(.9,.95),weight_decay=1.)
     state = model.initial_state(2)
-    for cycle in range(4):
+    for cycle in range(model.Nsup):
         optimizer.zero_grad(set_to_none=True)
         pred,state = model.forward_cycle(z,t,state)
         assert all(not v.requires_grad for v in state)
@@ -64,10 +68,16 @@ def main():
         assert core_grad == 0 if cycle == 0 else core_grad > 0
         optimizer.step()
     handle.remove()
-    assert counts == {False:56, True:28}, counts
+    assert counts == {False:14*model.Nsup, True:7*model.Nsup}, counts
+    if model.Nsup == 1:
+        optimizer.zero_grad(set_to_none=True)
+        pred,_ = model.forward_cycle(z,t,model.initial_state(len(z)))
+        weighted_mse(pred,target,t).backward()
+        assert sum(p.grad.abs().sum().item() for p in model.core.parameters() if p.grad is not None) > 0
+        optimizer.step()
     with torch.no_grad():
         state = model.initial_state(2)
-        for _ in range(4): pred,state = model.forward_cycle(z,t,state)
+        for _ in range(model.Nsup): pred,state = model.forward_cycle(z,t,state)
         assert torch.equal(pred, model(z,t))
         model(x,t)
         assert torch.equal(pred, model(z,t))
@@ -87,11 +97,11 @@ def main():
     assert torch.allclose(sample(Constant(),x,32),expected)
     report = dict(output_head=OUTPUT_HEAD_DESCRIPTION, gamma_only_head_exact=True, gamma_gradient=True,
         attention_matches_original=True, patch_roundtrip=True, jit_loss_equivalence=True,
-        single_time_sampling=True, Nsup=4, core_calls=counts, detached_state=True,
-        zero_head_then_nonzero_core_gradient=True, stateless_four_cycle_prediction=True,
+        single_time_sampling=True, Nsup=model.Nsup, core_calls=counts, detached_state=True,
+        zero_head_then_nonzero_core_gradient=True, stateless_prediction=True,
         optimizer_replay_exact=True, clamped_euler_all_steps=True,
         parameters=sum(p.numel() for p in model.parameters()), torch=torch.__version__)
-    out = Path('runs/cifar10_looped_flows_v3_jit/gamma_only_checks'); out.mkdir(parents=True,exist_ok=True)
+    out = Path('runs/cifar10_looped_flows_v3_jit') / ('gamma_only_checks' if model.Nsup==4 else 'nsup1_checks'); out.mkdir(parents=True,exist_ok=True)
     (out/'verification.json').write_text(json.dumps(report,indent=2))
     print(json.dumps(report,indent=2))
 

@@ -1,5 +1,7 @@
 # CIFAR-10 v3 / attention TRM + RoPE / JiT
 
+当前Nsup=4主实验已在98288步暂停，新开Nsup=1对照；配置、服务和比较口径见 [NSUP_COMPARISON.md](NSUP_COMPARISON.md)。以下四周期说明描述原Nsup=4基线，代码也支持 `--nsup 1`。
+
 将 attention TRM 作为独立去噪模块 `prediction = TRMJiT()(x, t)`：输入带噪 RGB，输出预测的干净 RGB，形状均为 B×3×32×32。无类别条件、无 CFG，从随机初始化训练。原 v2 与 Sudoku 项目保持不变。当前输出头已按 TRM 输出已做 RMSNorm 的设计，去掉 JiT 末端重复归一化，仅保留逐通道可学习 gamma（512维，初始化为1）。
 
 ## 递归与 deep supervision

@@ -1,4 +1,4 @@
-"""Real CIFAR-10 benchmark of all four supervision cycles, in an isolated process."""
+"""Real CIFAR-10 benchmark of configurable supervision cycles, in an isolated process."""
 import argparse
 import copy
 import json
@@ -13,13 +13,14 @@ from data import load_data, normalize
 p=argparse.ArgumentParser()
 p.add_argument('--batch-size',type=int,required=True)
 p.add_argument('--compile',action='store_true')
+p.add_argument('--nsup',type=int,choices=(1,4),default=4)
 p.add_argument('--synthetic',action='store_true',help='Only for compile warmup before dataset is downloaded')
 p.add_argument('--sequences',type=int,default=5)
 a=p.parse_args()
 torch.set_num_threads(3)
 torch.manual_seed(0)
 torch.backends.cuda.matmul.allow_tf32=True
-net=TRMJiT().cuda()
+net=TRMJiT(Nsup=a.nsup).cuda()
 ema=copy.deepcopy(net).requires_grad_(False)
 opt=AdamATan2(net.parameters(),lr=1e-4,betas=(.9,.95),weight_decay=1.)
 if a.compile: net.core.compile(dynamic=False)
@@ -33,7 +34,7 @@ try:
         t=sample_times(len(y)); noise=torch.randn_like(y)
         x=t[:,None,None,None]*y+(1-t[:,None,None,None])*noise
         state=net.initial_state(len(y))
-        for cycle in range(4):
+        for cycle in range(a.nsup):
             opt.zero_grad(set_to_none=True)
             pred,state=net.forward_cycle(x,t,state)
             loss=weighted_mse(pred,y,t)
@@ -42,12 +43,12 @@ try:
         print(json.dumps(dict(sequence=seq+1,loss=loss.item())),flush=True)
     torch.cuda.synchronize()
     elapsed=time.monotonic()-started
-    report.update(success=True,seconds_per_update=elapsed/((a.sequences-1)*4),
-        images_per_second=a.batch_size*(a.sequences-1)*4/elapsed,
+    report.update(success=True,seconds_per_update=elapsed/((a.sequences-1)*a.nsup),
+        images_per_second=a.batch_size*(a.sequences-1)*a.nsup/elapsed,
         peak_allocated_gib=torch.cuda.max_memory_allocated()/2**30,
         peak_reserved_gib=torch.cuda.max_memory_reserved()/2**30)
 except torch.OutOfMemoryError:
     report.update(success=False,error='CUDA OOM')
-out=Path('runs/cifar10_looped_flows_v3_jit/gamma_only_checks'); out.mkdir(parents=True,exist_ok=True)
+out=Path('runs/cifar10_looped_flows_v3_jit')/('gamma_only_checks' if a.nsup==4 else 'nsup1_checks'); out.mkdir(parents=True,exist_ok=True)
 (out/f'benchmark_{a.batch_size}_{"compile" if a.compile else "eager"}.json').write_text(json.dumps(report,indent=2))
 print(json.dumps(report,indent=2),flush=True)

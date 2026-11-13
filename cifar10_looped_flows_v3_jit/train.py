@@ -32,7 +32,7 @@ def atomic_save(path, value):
 @torch.no_grad()
 def validate(model, data, batch=64, t_eps=0.05):
     gen = torch.Generator(device='cuda').manual_seed(2026)
-    sums = torch.zeros(4, 5, device='cuda')
+    sums = torch.zeros(model.Nsup, 5, device='cuda')
     for chunk in data.split(batch):
         y = normalize(chunk)
         noise = torch.randn(y.shape, generator=gen, device='cuda')
@@ -50,9 +50,10 @@ def validate(model, data, batch=64, t_eps=0.05):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('--run', default='runs/cifar10_looped_flows_v3_jit/seed0_gamma_only')
+    p.add_argument('--run', default=None)
+    p.add_argument('--nsup', type=int, choices=(1,4), default=4)
     p.add_argument('--batch-size', type=int, default=768)
-    p.add_argument('--steps', type=int, default=100000, help='Local optimizer updates, must be multiple of Nsup=4')
+    p.add_argument('--steps', type=int, default=100000, help='Local optimizer updates, must be multiple of --nsup')
     p.add_argument('--seed', type=int, default=0)
     p.add_argument('--lr', type=float, default=1e-4)
     p.add_argument('--warmup', type=int, default=2000)
@@ -66,10 +67,13 @@ def main():
     p.add_argument('--p-std', type=float, default=0.8)
     p.add_argument('--t-eps', type=float, default=0.05)
     args = p.parse_args()
+    if args.run is None:
+        suffix = 'seed0_gamma_only' if args.nsup == 4 else 'seed0_gamma_only_nsup1'
+        args.run = 'runs/cifar10_looped_flows_v3_jit/' + suffix
     assert args.p_std > 0 and args.t_eps > 0
     assert args.batch_size > 0 and args.steps > 0 and args.warmup > 0
     assert args.save_every > 0 and args.eval_every > 0 and 0 < args.val_images <= 5000
-    assert args.steps % 4 == args.save_every % 4 == args.eval_every % 4 == 0
+    assert args.steps % args.nsup == args.save_every % args.nsup == args.eval_every % args.nsup == 0
     torch.set_num_threads(3)
     torch.backends.cuda.matmul.allow_tf32 = True
     run = ROOT / args.run
@@ -79,25 +83,25 @@ def main():
     torch.manual_seed(args.seed)
     torch.cuda.manual_seed_all(args.seed)
     train, val = load_data()
-    model = TRMJiT().cuda()
+    model = TRMJiT(Nsup=args.nsup).cuda()
     ema = copy.deepcopy(model).eval().requires_grad_(False)
     optimizer = AdamATan2(model.parameters(), lr=args.lr, betas=(.9, .95), weight_decay=1.)
     step = 0
     checkpoint = run / 'latest.pt'
-    config = dict(vars(args), Nsup=4, H_cycles=3, L_cycles=6, optimizer='vendored AdamATan2 0.0.3 fused CUDA',
+    config = dict(vars(args), Nsup=args.nsup, H_cycles=3, L_cycles=6, optimizer='vendored AdamATan2 0.0.3 fused CUDA',
                   cuda_arch='sm'+''.join(map(str, torch.cuda.get_device_capability())),
                   betas=[.9,.95], weight_decay=1., ema=.999, lr_schedule='linear warmup then constant (original TRM)',
                   parameters=sum(p.numel() for p in model.parameters()),
                   output_head=OUTPUT_HEAD_DESCRIPTION,
                   torch=torch.__version__, gpu=torch.cuda.get_device_name(),
-                  time_sampling='one sigmoid(N(p_mean,p_std^2)) time per image; fixed across Nsup=4',
+                  time_sampling=f'one sigmoid(N(p_mean,p_std^2)) time per image; fixed across Nsup={args.nsup}',
                   loss='mean(((prediction-target)/max(1-t,t_eps))^2)',
                   jit_source_sha='cbc743a2ada5e9762697da2c83f8c4f8379e8c17',
                   train_sampling='uniform with replacement', train_images=45000, val_images=args.val_images,
                   init='TRM truncated LeCun linear; fixed random h/l buffers',
                   source='trm/vendor @ c01103738605ba39d1430519b1ee0c62f4c707f8',
                   projection_scale=512**.5, integration='FP32 Euler; stateless BF16 attention TRM denoiser',
-                  deep_supervision='4 local updates on same x,t,target; detached state between cycles',
+                  deep_supervision=f'{args.nsup} local updates on same x,t,target; detached state between cycles',
                   architecture='2 shared attention blocks, D512, heads8, expansion4, RoPE, patch4',
                   position_encoding=dict(type='RoPE', theta=10000., head_dim=64, tokens=64))
     if checkpoint.exists():
@@ -156,7 +160,7 @@ def main():
             t = sample_times(len(y), device='cuda', mean=args.p_mean, std=args.p_std)
             x = (1-t[:,None,None,None])*noise + t[:,None,None,None]*y
             state = model.initial_state(len(y))
-            for i in range(4):
+            for i in range(args.nsup):
                 optimizer.zero_grad(set_to_none=True)
                 lr = args.lr*min(1., (step+1)/args.warmup)
                 for group in optimizer.param_groups:
@@ -174,7 +178,7 @@ def main():
                     torch.cuda.synchronize()
                     with torch.no_grad():
                         image_emb, time_emb = model.embeddings(x, t)
-                        rec = dict(step=step, sequences=(step+3)//4, supervision_cycle=i+1, loss=loss.item(), raw_mse=(pred-y).square().mean().item(),
+                        rec = dict(step=step, sequences=(step+args.nsup-1)//args.nsup, supervision_cycle=i+1, loss=loss.item(), raw_mse=(pred-y).square().mean().item(),
                                    time_mean=t.mean().item(), time_min=t.min().item(), time_max=t.max().item(), lr=lr,
                                    seconds=time.monotonic()-started, seconds_per_update=(time.monotonic()-started)/(step-start_step),
                                    peak_memory_gib=torch.cuda.max_memory_allocated()/2**30,

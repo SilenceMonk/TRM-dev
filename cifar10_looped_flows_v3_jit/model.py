@@ -1,4 +1,4 @@
-"""Stateless JiT denoiser wrapping attention TRM with fixed deep supervision."""
+"""Stateless JiT denoiser wrapping attention TRM with configurable supervision cycles."""
 import math
 import sys
 from pathlib import Path
@@ -50,8 +50,11 @@ class TRMJiT(nn.Module):
     H_cycles = 3
     L_cycles = 6
 
-    def __init__(self):
+    def __init__(self, Nsup=4):
         super().__init__()
+        if Nsup not in (1, 4):
+            raise ValueError("Nsup must be 1 or 4")
+        self.Nsup = Nsup
         self.input = CastedLinear(48, 512, bias=False)
         self.time = nn.Sequential(CastedLinear(1, 512, bias=True), nn.SiLU(), CastedLinear(512, 512, bias=True))
         self.rotary_emb = RotaryEmbedding(64, 64, 10000.)
